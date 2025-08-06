@@ -1,8 +1,8 @@
 {
-  "name": "my-new-app",
-  "productName": "my-new-app",
+  "name": "middas-gestion",
+  "productName": "Middas Gestión",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Sistema de gestión empresarial Middas",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
