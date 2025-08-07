@@ -1,29 +1,31 @@
-import { app } from 'electron';
-import * as path from 'path';
-import Datastore from '@seald-io/nedb';
-import { v4 as uuidv4 } from 'uuid';
-import { Product, ProductFilters, ProductStats } from '../types/product';
+import { app } from "electron";
+import * as path from "path";
+import Datastore from "@seald-io/nedb";
+import { v4 as uuidv4 } from "uuid";
+import { Product, ProductFilters, ProductStats } from "../types/product";
 
 class ProductDatabase {
   private db: Datastore<Product>;
 
   constructor() {
-    const userDataPath = app.getPath('userData');
-    const dbPath = path.join(userDataPath, 'products.db');
-    
+    const userDataPath = app.getPath("userData");
+    const dbPath = path.join(userDataPath, "products.db");
+
     this.db = new Datastore<Product>({
       filename: dbPath,
       autoload: true,
     });
 
     // Crear índices para mejor rendimiento
-    this.db.ensureIndex({ fieldName: 'id', unique: true });
-    this.db.ensureIndex({ fieldName: 'name' });
-    this.db.ensureIndex({ fieldName: 'category' });
-    this.db.ensureIndex({ fieldName: 'barcode', sparse: true });
+    this.db.ensureIndex({ fieldName: "id", unique: true });
+    this.db.ensureIndex({ fieldName: "name" });
+    this.db.ensureIndex({ fieldName: "category" });
+    this.db.ensureIndex({ fieldName: "barcode", sparse: true });
   }
 
-  async createProduct(productData: Omit<Product, '_id' | 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> {
+  async createProduct(
+    productData: Omit<Product, "_id" | "id" | "createdAt" | "updatedAt">
+  ): Promise<Product> {
     const now = new Date();
     const product: Product = {
       id: uuidv4(),
@@ -47,12 +49,12 @@ class ProductDatabase {
       if (filters) {
         if (filters.search) {
           query.$or = [
-            { name: new RegExp(filters.search, 'i') },
-            { description: new RegExp(filters.search, 'i') },
-            { barcode: new RegExp(filters.search, 'i') },
+            { name: new RegExp(filters.search, "i") },
+            { description: new RegExp(filters.search, "i") },
+            { barcode: new RegExp(filters.search, "i") },
           ];
         }
-        
+
         if (filters.category) {
           query.category = filters.category;
         }
@@ -74,10 +76,13 @@ class ProductDatabase {
         }
       }
 
-      this.db.find(query).sort({ updatedAt: -1 }).exec((err, products) => {
-        if (err) reject(err);
-        else resolve(products);
-      });
+      this.db
+        .find(query)
+        .sort({ updatedAt: -1 })
+        .exec((err, products) => {
+          if (err) reject(err);
+          else resolve(products);
+        });
     });
   }
 
@@ -90,7 +95,10 @@ class ProductDatabase {
     });
   }
 
-  async updateProduct(id: string, updates: Partial<Product>): Promise<Product | null> {
+  async updateProduct(
+    id: string,
+    updates: Partial<Product>
+  ): Promise<Product | null> {
     const updateData = {
       ...updates,
       updatedAt: new Date(),
@@ -129,10 +137,17 @@ class ProductDatabase {
 
         const stats: ProductStats = {
           total: products.length,
-          lowStock: products.filter((p: Product) => p.stock <= p.minStock && p.stock > 0).length,
+          lowStock: products.filter(
+            (p: Product) => p.stock <= p.minStock && p.stock > 0
+          ).length,
           outOfStock: products.filter((p: Product) => p.stock === 0).length,
-          totalValue: products.reduce((sum: number, p: Product) => sum + (p.price * p.stock), 0),
-          categories: [...new Set(products.map((p: Product) => p.category))].sort() as string[],
+          totalValue: products.reduce(
+            (sum: number, p: Product) => sum + p.price * p.stock,
+            0
+          ),
+          categories: [
+            ...new Set(products.map((p: Product) => p.category)),
+          ].sort() as string[],
         };
 
         resolve(stats);
@@ -142,15 +157,15 @@ class ProductDatabase {
 
   async getLowStockProducts(): Promise<Product[]> {
     return new Promise((resolve, reject) => {
-      this.db.find({
-        $or: [
-          { stock: { $lte: '$minStock', $gt: 0 } },
-          { stock: 0 }
-        ]
-      }).sort({ stock: 1 }).exec((err, products) => {
-        if (err) reject(err);
-        else resolve(products);
-      });
+      this.db
+        .find({
+          $or: [{ stock: { $lte: "$minStock", $gt: 0 } }, { stock: 0 }],
+        })
+        .sort({ stock: 1 })
+        .exec((err, products) => {
+          if (err) reject(err);
+          else resolve(products);
+        });
     });
   }
 }

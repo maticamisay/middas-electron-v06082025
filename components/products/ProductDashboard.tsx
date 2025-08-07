@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
-import { Card, CardHeader, CardContent } from '../ui/Card';
-import { Table } from '../ui/Table';
-import { Modal } from '../ui/Modal';
-import { Product, ProductFilters } from '../../src/types/product';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Button } from "../ui/Button";
+import { Input } from "../ui/Input";
+import { Card, CardHeader, CardContent } from "../ui/Card";
+import { Table } from "../ui/Table";
+import { Modal } from "../ui/Modal";
+import { Product, ProductFilters } from "../../src/types/product";
 
 export const ProductDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -19,14 +19,14 @@ export const ProductDashboard: React.FC = () => {
 
   // Form state
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    stock: '',
-    category: '',
-    barcode: '',
-    supplier: '',
-    minStock: ''
+    name: "",
+    description: "",
+    price: "",
+    stock: "",
+    category: "",
+    barcode: "",
+    supplier: "",
+    minStock: "",
   });
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export const ProductDashboard: React.FC = () => {
       const data = await window.electronAPI.getAllProducts();
       setProducts(data);
     } catch (error) {
-      console.error('Error loading products:', error);
+      console.error("Error loading products:", error);
     } finally {
       setLoading(false);
     }
@@ -55,7 +55,7 @@ export const ProductDashboard: React.FC = () => {
       const data = await window.electronAPI.getProductStats();
       setStats(data);
     } catch (error) {
-      console.error('Error loading stats:', error);
+      console.error("Error loading stats:", error);
     }
   };
 
@@ -64,15 +64,19 @@ export const ProductDashboard: React.FC = () => {
 
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchTerm) ||
-        product.description.toLowerCase().includes(searchTerm) ||
-        (product.barcode && product.barcode.toLowerCase().includes(searchTerm))
+      filtered = filtered.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchTerm) ||
+          product.description.toLowerCase().includes(searchTerm) ||
+          (product.barcode &&
+            product.barcode.toLowerCase().includes(searchTerm))
       );
     }
 
     if (filters.category) {
-      filtered = filtered.filter(product => product.category === filters.category);
+      filtered = filtered.filter(
+        (product) => product.category === filters.category
+      );
     }
 
     setFilteredProducts(filtered);
@@ -80,7 +84,7 @@ export const ProductDashboard: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       const productData = {
         name: formData.name,
@@ -90,7 +94,7 @@ export const ProductDashboard: React.FC = () => {
         category: formData.category,
         barcode: formData.barcode || undefined,
         supplier: formData.supplier || undefined,
-        minStock: parseInt(formData.minStock)
+        minStock: parseInt(formData.minStock),
       };
 
       if (editingProduct) {
@@ -104,7 +108,7 @@ export const ProductDashboard: React.FC = () => {
       resetForm();
       setIsModalOpen(false);
     } catch (error) {
-      console.error('Error saving product:', error);
+      console.error("Error saving product:", error);
     }
   };
 
@@ -116,9 +120,9 @@ export const ProductDashboard: React.FC = () => {
       price: product.price.toString(),
       stock: product.stock.toString(),
       category: product.category,
-      barcode: product.barcode || '',
-      supplier: product.supplier || '',
-      minStock: product.minStock.toString()
+      barcode: product.barcode || "",
+      supplier: product.supplier || "",
+      minStock: product.minStock.toString(),
     });
     setIsModalOpen(true);
   };
@@ -130,21 +134,21 @@ export const ProductDashboard: React.FC = () => {
         await loadProducts();
         await loadStats();
       } catch (error) {
-        console.error('Error deleting product:', error);
+        console.error("Error deleting product:", error);
       }
     }
   };
 
   const resetForm = () => {
     setFormData({
-      name: '',
-      description: '',
-      price: '',
-      stock: '',
-      category: '',
-      barcode: '',
-      supplier: '',
-      minStock: ''
+      name: "",
+      description: "",
+      price: "",
+      stock: "",
+      category: "",
+      barcode: "",
+      supplier: "",
+      minStock: "",
     });
     setEditingProduct(null);
   };
@@ -155,36 +159,42 @@ export const ProductDashboard: React.FC = () => {
   };
 
   const columns = [
-    { key: 'name', label: 'Nombre' },
-    { key: 'category', label: 'Categoría' },
-    { 
-      key: 'price', 
-      label: 'Precio', 
-      render: (value: number) => `$${value.toFixed(2)}` 
-    },
-    { 
-      key: 'stock', 
-      label: 'Stock',
-      render: (value: number, item: Product) => (
-        <span className={value <= item.minStock ? 'text-red-600 font-semibold' : ''}>
-          {value}
-        </span>
-      )
+    { key: "name", label: "Nombre" },
+    { key: "category", label: "Categoría" },
+    {
+      key: "price",
+      label: "Precio",
+      render: (value: number) => `$${value.toFixed(2)}`,
     },
     {
-      key: 'actions',
-      label: 'Acciones',
+      key: "stock",
+      label: "Stock",
+      render: (value: number, item: Product) => (
+        <span
+          className={value <= item.minStock ? "text-red-600 font-semibold" : ""}
+        >
+          {value}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      label: "Acciones",
       render: (_: any, item: Product) => (
         <div className="flex space-x-2">
-          <Button size="sm" variant="secondary" onClick={() => handleEdit(item)}>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => handleEdit(item)}
+          >
             Editar
           </Button>
           <Button size="sm" variant="danger" onClick={() => handleDelete(item)}>
             Eliminar
           </Button>
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   if (loading) {
@@ -211,7 +221,9 @@ export const ProductDashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <Card>
               <CardContent>
-                <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+                <div className="text-2xl font-bold text-blue-600">
+                  {stats.total}
+                </div>
                 <div className="text-sm text-gray-600">Total Productos</div>
               </CardContent>
             </Card>
@@ -225,13 +237,17 @@ export const ProductDashboard: React.FC = () => {
             </Card>
             <Card>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-600">{stats.lowStock}</div>
+                <div className="text-2xl font-bold text-orange-600">
+                  {stats.lowStock}
+                </div>
                 <div className="text-sm text-gray-600">Stock Bajo</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent>
-                <div className="text-2xl font-bold text-red-600">{stats.outOfStock}</div>
+                <div className="text-2xl font-bold text-red-600">
+                  {stats.outOfStock}
+                </div>
                 <div className="text-sm text-gray-600">Sin Stock</div>
               </CardContent>
             </Card>
@@ -243,7 +259,7 @@ export const ProductDashboard: React.FC = () => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Productos</h2>
-              <Button onClick={() => navigate('/products/new')}>
+              <Button onClick={() => navigate("/products/new")}>
                 Agregar Producto
               </Button>
             </div>
@@ -252,23 +268,26 @@ export const ProductDashboard: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Input
                 placeholder="Buscar productos..."
-                value={filters.search || ''}
-                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                value={filters.search || ""}
+                onChange={(e) =>
+                  setFilters({ ...filters, search: e.target.value })
+                }
               />
               <select
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={filters.category || ''}
-                onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                value={filters.category || ""}
+                onChange={(e) =>
+                  setFilters({ ...filters, category: e.target.value })
+                }
               >
                 <option value="">Todas las categorías</option>
                 {stats?.categories?.map((category: string) => (
-                  <option key={category} value={category}>{category}</option>
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
                 ))}
               </select>
-              <Button 
-                variant="secondary" 
-                onClick={() => setFilters({})}
-              >
+              <Button variant="secondary" onClick={() => setFilters({})}>
                 Limpiar Filtros
               </Button>
             </div>
@@ -278,10 +297,7 @@ export const ProductDashboard: React.FC = () => {
         {/* Products Table */}
         <Card>
           <CardContent className="p-0">
-            <Table
-              data={filteredProducts}
-              columns={columns}
-            />
+            <Table data={filteredProducts} columns={columns} />
           </CardContent>
         </Card>
 
@@ -289,7 +305,7 @@ export const ProductDashboard: React.FC = () => {
         <Modal
           isOpen={isModalOpen}
           onClose={handleModalClose}
-          title={editingProduct ? 'Editar Producto' : 'Agregar Producto'}
+          title={editingProduct ? "Editar Producto" : "Agregar Producto"}
           size="lg"
         >
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -297,13 +313,17 @@ export const ProductDashboard: React.FC = () => {
               <Input
                 label="Nombre *"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 required
               />
               <Input
                 label="Categoría *"
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, category: e.target.value })
+                }
                 required
               />
               <Input
@@ -311,32 +331,42 @@ export const ProductDashboard: React.FC = () => {
                 type="number"
                 step="0.01"
                 value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, price: e.target.value })
+                }
                 required
               />
               <Input
                 label="Stock *"
                 type="number"
                 value={formData.stock}
-                onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, stock: e.target.value })
+                }
                 required
               />
               <Input
                 label="Stock Mínimo *"
                 type="number"
                 value={formData.minStock}
-                onChange={(e) => setFormData({ ...formData, minStock: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, minStock: e.target.value })
+                }
                 required
               />
               <Input
                 label="Código de Barras"
                 value={formData.barcode}
-                onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, barcode: e.target.value })
+                }
               />
               <Input
                 label="Proveedor"
                 value={formData.supplier}
-                onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, supplier: e.target.value })
+                }
               />
             </div>
             <div className="col-span-2">
@@ -347,16 +377,22 @@ export const ProductDashboard: React.FC = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows={3}
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 required
               />
             </div>
             <div className="flex justify-end space-x-3 pt-4">
-              <Button type="button" variant="secondary" onClick={handleModalClose}>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleModalClose}
+              >
                 Cancelar
               </Button>
               <Button type="submit">
-                {editingProduct ? 'Actualizar' : 'Crear'} Producto
+                {editingProduct ? "Actualizar" : "Crear"} Producto
               </Button>
             </div>
           </form>
