@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Product } from "../../src/types/product";
+import { Category } from "../../src/types/category";
+import { Supplier } from "../../src/types/supplier";
 
 interface NewProductFormProps {
   onSubmit: (
@@ -16,6 +18,8 @@ export const NewProductForm: React.FC<NewProductFormProps> = ({
   onCancel,
   isLoading = false,
 }) => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [formData, setFormData] = useState({
     id: "",
     name: "",
@@ -29,6 +33,23 @@ export const NewProductForm: React.FC<NewProductFormProps> = ({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    loadCategoriesAndSuppliers();
+  }, []);
+
+  const loadCategoriesAndSuppliers = async () => {
+    try {
+      const [categoriesData, suppliersData] = await Promise.all([
+        window.electronAPI.getAllCategories(),
+        window.electronAPI.getAllSuppliers()
+      ]);
+      setCategories(categoriesData);
+      setSuppliers(suppliersData);
+    } catch (error) {
+      console.error('Error loading categories and suppliers:', error);
+    }
+  };
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -94,18 +115,6 @@ export const NewProductForm: React.FC<NewProductFormProps> = ({
     }
   };
 
-  const commonCategories = [
-    "Electrónicos",
-    "Ropa",
-    "Hogar",
-    "Deportes",
-    "Libros",
-    "Salud y Belleza",
-    "Automóvil",
-    "Juguetes",
-    "Alimentación",
-    "Otros",
-  ];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -191,9 +200,9 @@ export const NewProductForm: React.FC<NewProductFormProps> = ({
             disabled={isLoading}
           >
             <option value="">Seleccionar categoría</option>
-            {commonCategories.map((category) => (
-              <option key={category} value={category}>
-                {category}
+            {categories.map((category) => (
+              <option key={category.id} value={category.name}>
+                {category.name}
               </option>
             ))}
           </select>
@@ -229,15 +238,30 @@ export const NewProductForm: React.FC<NewProductFormProps> = ({
         />
       </div>
 
-      <Input
-        label="Proveedor"
-        name="supplier"
-        value={formData.supplier}
-        onChange={handleChange}
-        error={errors.supplier}
-        placeholder="Nombre del proveedor (opcional)"
-        disabled={isLoading}
-      />
+      <div className="flex flex-col">
+        <label className="mb-1 text-sm font-medium text-gray-700">
+          Proveedor
+        </label>
+        <select
+          name="supplier"
+          value={formData.supplier}
+          onChange={handleChange}
+          className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+            errors.supplier ? "border-red-500 focus:ring-red-500" : ""
+          }`}
+          disabled={isLoading}
+        >
+          <option value="">Seleccionar proveedor (opcional)</option>
+          {suppliers.map((supplier) => (
+            <option key={supplier.id} value={supplier.name}>
+              {supplier.name}
+            </option>
+          ))}
+        </select>
+        {errors.supplier && (
+          <span className="mt-1 text-sm text-red-600">{errors.supplier}</span>
+        )}
+      </div>
 
       <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
         <Button

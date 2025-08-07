@@ -3,6 +3,8 @@
 
 import { contextBridge, ipcRenderer } from 'electron';
 import { Product, ProductFilters } from './types/product';
+import { Category, CategoryFilters } from './types/category';
+import { Supplier, SupplierFilters } from './types/supplier';
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
@@ -28,6 +30,38 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   getLowStockProducts: () =>
     ipcRenderer.invoke('product:getLowStock'),
+
+  // Category operations
+  createCategory: (categoryData: Omit<Category, '_id' | 'id' | 'createdAt' | 'updatedAt'>) =>
+    ipcRenderer.invoke('category:create', categoryData),
+  
+  getAllCategories: (filters?: CategoryFilters) =>
+    ipcRenderer.invoke('category:getAll', filters),
+  
+  getCategoryById: (id: string) =>
+    ipcRenderer.invoke('category:getById', id),
+  
+  updateCategory: (id: string, updates: Partial<Category>) =>
+    ipcRenderer.invoke('category:update', id, updates),
+  
+  deleteCategory: (id: string) =>
+    ipcRenderer.invoke('category:delete', id),
+
+  // Supplier operations
+  createSupplier: (supplierData: Omit<Supplier, '_id' | 'id' | 'createdAt' | 'updatedAt'>) =>
+    ipcRenderer.invoke('supplier:create', supplierData),
+  
+  getAllSuppliers: (filters?: SupplierFilters) =>
+    ipcRenderer.invoke('supplier:getAll', filters),
+  
+  getSupplierById: (id: string) =>
+    ipcRenderer.invoke('supplier:getById', id),
+  
+  updateSupplier: (id: string, updates: Partial<Supplier>) =>
+    ipcRenderer.invoke('supplier:update', id, updates),
+  
+  deleteSupplier: (id: string) =>
+    ipcRenderer.invoke('supplier:delete', id),
 });
 
 // Add type definitions for the exposed API
@@ -41,6 +75,18 @@ declare global {
       deleteProduct: (id: string) => Promise<boolean>;
       getProductStats: () => Promise<any>;
       getLowStockProducts: () => Promise<Product[]>;
+      // Category operations
+      createCategory: (categoryData: Omit<Category, '_id' | 'id' | 'createdAt' | 'updatedAt'>) => Promise<Category>;
+      getAllCategories: (filters?: CategoryFilters) => Promise<Category[]>;
+      getCategoryById: (id: string) => Promise<Category | null>;
+      updateCategory: (id: string, updates: Partial<Category>) => Promise<Category | null>;
+      deleteCategory: (id: string) => Promise<boolean>;
+      // Supplier operations
+      createSupplier: (supplierData: Omit<Supplier, '_id' | 'id' | 'createdAt' | 'updatedAt'>) => Promise<Supplier>;
+      getAllSuppliers: (filters?: SupplierFilters) => Promise<Supplier[]>;
+      getSupplierById: (id: string) => Promise<Supplier | null>;
+      updateSupplier: (id: string, updates: Partial<Supplier>) => Promise<Supplier | null>;
+      deleteSupplier: (id: string) => Promise<boolean>;
     };
   }
 }

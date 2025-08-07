@@ -27,10 +27,16 @@ const menuItems: MenuItem[] = [
     icon: "📦"
   },
   {
-    id: "inventory",
-    label: "Inventario",
-    path: "/inventory",
-    icon: "📋"
+    id: "categories",
+    label: "Categorías",
+    path: "/categories",
+    icon: "🏷️"
+  },
+  {
+    id: "suppliers",
+    label: "Proveedores",
+    path: "/suppliers",
+    icon: "🏢"
   },
   {
     id: "reports",
@@ -95,7 +101,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
           <nav className="flex-1 px-4 py-6 space-y-2">
             {menuItems.map((item) => {
               const isActive = location.pathname === item.path || 
-                             (item.path === '/products' && location.pathname.startsWith('/products'));
+                             (item.path === '/products' && location.pathname.startsWith('/products')) ||
+                             (item.path === '/categories' && location.pathname.startsWith('/categories')) ||
+                             (item.path === '/suppliers' && location.pathname.startsWith('/suppliers'));
               
               return (
                 <button

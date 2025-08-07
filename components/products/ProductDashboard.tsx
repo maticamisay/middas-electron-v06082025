@@ -6,6 +6,8 @@ import { Card, CardHeader, CardContent } from "../ui/Card";
 import { Table } from "../ui/Table";
 import { Modal } from "../ui/Modal";
 import { Product, ProductFilters } from "../../src/types/product";
+import { Category } from "../../src/types/category";
+import { Supplier } from "../../src/types/supplier";
 
 export const ProductDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +18,8 @@ export const ProductDashboard: React.FC = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [filters, setFilters] = useState<ProductFilters>({});
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -32,6 +36,7 @@ export const ProductDashboard: React.FC = () => {
   useEffect(() => {
     loadProducts();
     loadStats();
+    loadCategoriesAndSuppliers();
   }, []);
 
   useEffect(() => {
@@ -56,6 +61,19 @@ export const ProductDashboard: React.FC = () => {
       setStats(data);
     } catch (error) {
       console.error("Error loading stats:", error);
+    }
+  };
+
+  const loadCategoriesAndSuppliers = async () => {
+    try {
+      const [categoriesData, suppliersData] = await Promise.all([
+        window.electronAPI.getAllCategories(),
+        window.electronAPI.getAllSuppliers()
+      ]);
+      setCategories(categoriesData);
+      setSuppliers(suppliersData);
+    } catch (error) {
+      console.error('Error loading categories and suppliers:', error);
     }
   };
 
@@ -281,9 +299,9 @@ export const ProductDashboard: React.FC = () => {
                 }
               >
                 <option value="">Todas las categorías</option>
-                {stats?.categories?.map((category: string) => (
-                  <option key={category} value={category}>
-                    {category}
+                {categories.map((category) => (
+                  <option key={category.id} value={category.name}>
+                    {category.name}
                   </option>
                 ))}
               </select>
@@ -318,14 +336,26 @@ export const ProductDashboard: React.FC = () => {
                 }
                 required
               />
-              <Input
-                label="Categoría *"
-                value={formData.category}
-                onChange={(e) =>
-                  setFormData({ ...formData, category: e.target.value })
-                }
-                required
-              />
+              <div>
+                <label className="block mb-1 text-sm font-medium text-gray-700">
+                  Categoría *
+                </label>
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={formData.category}
+                  onChange={(e) =>
+                    setFormData({ ...formData, category: e.target.value })
+                  }
+                  required
+                >
+                  <option value="">Seleccionar categoría</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <Input
                 label="Precio *"
                 type="number"
@@ -361,13 +391,25 @@ export const ProductDashboard: React.FC = () => {
                   setFormData({ ...formData, barcode: e.target.value })
                 }
               />
-              <Input
-                label="Proveedor"
-                value={formData.supplier}
-                onChange={(e) =>
-                  setFormData({ ...formData, supplier: e.target.value })
-                }
-              />
+              <div>
+                <label className="block mb-1 text-sm font-medium text-gray-700">
+                  Proveedor
+                </label>
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={formData.supplier}
+                  onChange={(e) =>
+                    setFormData({ ...formData, supplier: e.target.value })
+                  }
+                >
+                  <option value="">Seleccionar proveedor (opcional)</option>
+                  {suppliers.map((supplier) => (
+                    <option key={supplier.id} value={supplier.name}>
+                      {supplier.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="col-span-2">
               <label className="block mb-1 text-sm font-medium text-gray-700">
