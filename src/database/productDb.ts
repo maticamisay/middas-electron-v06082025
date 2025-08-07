@@ -121,7 +121,7 @@ class ProductDatabase {
 
   async getProductStats(): Promise<ProductStats> {
     return new Promise((resolve, reject) => {
-      this.db.find({}, (err, products) => {
+      this.db.find({}, (err: Error | null, products: Product[]) => {
         if (err) {
           reject(err);
           return;
@@ -129,10 +129,10 @@ class ProductDatabase {
 
         const stats: ProductStats = {
           total: products.length,
-          lowStock: products.filter(p => p.stock <= p.minStock && p.stock > 0).length,
-          outOfStock: products.filter(p => p.stock === 0).length,
-          totalValue: products.reduce((sum, p) => sum + (p.price * p.stock), 0),
-          categories: [...new Set(products.map(p => p.category))].sort(),
+          lowStock: products.filter((p: Product) => p.stock <= p.minStock && p.stock > 0).length,
+          outOfStock: products.filter((p: Product) => p.stock === 0).length,
+          totalValue: products.reduce((sum: number, p: Product) => sum + (p.price * p.stock), 0),
+          categories: [...new Set(products.map((p: Product) => p.category))].sort() as string[],
         };
 
         resolve(stats);

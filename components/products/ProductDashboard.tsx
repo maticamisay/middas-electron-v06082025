@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from './Button';
-import { Input } from './Input';
-import { Card, CardHeader, CardContent } from './Card';
-import { Table } from './Table';
-import { Modal } from './Modal';
-import { Product, ProductFilters } from '../src/types/product';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
+import { Card, CardHeader, CardContent } from '../ui/Card';
+import { Table } from '../ui/Table';
+import { Modal } from '../ui/Modal';
+import { Product, ProductFilters } from '../../src/types/product';
 
 export const ProductDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [stats, setStats] = useState<any>(null);
@@ -241,7 +243,7 @@ export const ProductDashboard: React.FC = () => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Productos</h2>
-              <Button onClick={() => setIsModalOpen(true)}>
+              <Button onClick={() => navigate('/products/new')}>
                 Agregar Producto
               </Button>
             </div>
